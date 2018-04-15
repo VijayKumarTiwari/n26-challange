@@ -23,7 +23,6 @@ public class TransactionDataHandler {
     }
 
     public Stat getTransactionStats() {
-        removeOldTransactions(System.currentTimeMillis() - properties.getSecondsToUseForStats() * 1000);
         DoubleSummaryStatistics transactionStats = transactions.stream()
                 .map(Transaction::getAmount)
                 .collect(DoubleSummaryStatistics::new, DoubleSummaryStatistics::accept, DoubleSummaryStatistics::combine);
@@ -43,5 +42,12 @@ public class TransactionDataHandler {
                 .min(transactionStats.getMin())
                 .count(transactionStats.getCount())
                 .build();
+    }
+
+    public int clearOldTransactions() {
+        final long minValidTimeInMillis = System.currentTimeMillis() - properties.getSecondsToUseForStats() * 1000;
+        int currentSize = transactions.size();
+        removeOldTransactions(minValidTimeInMillis);
+        return currentSize - transactions.size();
     }
 }

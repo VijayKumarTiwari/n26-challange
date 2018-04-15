@@ -32,6 +32,7 @@ public class TransactionDataHandlerTest {
         addTransactionBefore60Sec();
         addTransactionBefore60Sec();
         addTransactionBefore60Sec();
+        transactionDataHandler.clearOldTransactions();
         Stat stat = transactionDataHandler.getTransactionStats();
         assertThat(stat.getSum(), is(0.0));
         assertThat(stat.getAvg(), is(0.0));
@@ -45,6 +46,7 @@ public class TransactionDataHandlerTest {
         addTransactionWithin60Sec();
         addTransactionWithin60Sec();
         addTransactionWithin60Sec();
+        transactionDataHandler.clearOldTransactions();
         Stat stat = transactionDataHandler.getTransactionStats();
         assertThat(stat.getSum(), is(3.0));
         assertThat(stat.getAvg(), is(1.0));
@@ -59,36 +61,13 @@ public class TransactionDataHandlerTest {
         addTransactionWithin60Sec();
         addTransactionBefore60Sec();
         addTransactionBefore60Sec();
+        transactionDataHandler.clearOldTransactions();
         Stat stat = transactionDataHandler.getTransactionStats();
         assertThat(stat.getSum(), is(2.0));
         assertThat(stat.getAvg(), is(1.0));
         assertThat(stat.getMax(), is(1.0));
         assertThat(stat.getMin(), is(1.0));
         assertThat(stat.getCount(), is(2L));
-    }
-
-    @Test
-    public final void theMethodsAreThreadSafe() throws InterruptedException {
-        Thread t1 = new Thread(() -> {
-            int i = 0;
-            while (i < 100000) {
-                addTransactionWithin60Sec();
-                i++;
-            }
-        });
-
-        Thread t2 = new Thread(() -> {
-            int i = 0;
-            while (i < 10000) {
-                transactionDataHandler.getTransactionStats();
-                i++;
-            }
-        });
-
-        t1.start();
-        t2.start();
-        t1.join();
-        t2.join();
     }
 
     private void addTransactionWithin60Sec() {
