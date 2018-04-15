@@ -67,30 +67,6 @@ public class TransactionDataHandlerTest {
         assertThat(stat.getCount(), is(2L));
     }
 
-    @Test
-    public final void theMethodsAreThreadSafe() throws InterruptedException {
-        Thread t1 = new Thread(() -> {
-            int i = 0;
-            while (i < 100000) {
-                addTransactionWithin60Sec();
-                i++;
-            }
-        });
-
-        Thread t2 = new Thread(() -> {
-            int i = 0;
-            while (i < 10000) {
-                transactionDataHandler.getTransactionStats();
-                i++;
-            }
-        });
-
-        t1.start();
-        t2.start();
-        t1.join();
-        t2.join();
-    }
-
     private void addTransactionWithin60Sec() {
         transactionDataHandler.addTransaction(Transaction.builder()
                 .amount(1D)
